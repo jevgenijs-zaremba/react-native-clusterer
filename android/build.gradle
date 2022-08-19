@@ -60,8 +60,8 @@ android {
   compileSdkVersion getExtOrDefault('compileSdkVersion', 28)
 
   defaultConfig {
-    minSdkVersion getExtOrDefault('minSdkVersion', 16)
-    targetSdkVersion getExtOrDefault('targetSdkVersion', 28)
+    minSdkVersion getExtOrDefault('minSdkVersion', 28)
+    targetSdkVersion getExtOrDefault('targetSdkVersion', 30)
 
     externalNativeBuild {
       cmake {
@@ -112,7 +112,15 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation 'com.facebook.react:react-native:+'
 
-  def rnAAR = fileTree(reactNativePath).matching({ it.include "**/**/*.aar" }).singleFile
+  def buildType = "debug"
+  tasks.all({ task ->
+    if (task.name == "buildCMakeRelease") {
+      buildType = "release"
+    }
+  })
+
+  def rnAarMatcher = "/com/**/react-native/**/*${buildType}.aar"
+  def rnAAR = fileTree(reactNativePath).matching({ it.include rnAarMatcher }).singleFile
   extractJNI(files(rnAAR))
 }
 
